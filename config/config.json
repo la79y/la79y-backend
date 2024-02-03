@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "admin",
+    "password": "1234",
+    "database": "la79y",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "admin",
+    "password": "1234",
+    "database": "la79y-test",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "admin",
+    "password": "1234",
+    "database": "la79y_production",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}
