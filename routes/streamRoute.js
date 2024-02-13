@@ -9,8 +9,8 @@ router.post("/stream", authenticateToken, async (req, res) => {
     const stream = req.body;
     stream.userid = req.user.userId + "";
 
-    stream.streamerUrl = `srt://127.0.0.1:1234?streamid=#!::r=${stream.streamResource},m=${stream.streamMode},t=stream&transtype=live&mode=${stream.streamSrtMode}&latency=3200000`;
-    stream.playerUrl = `srt://127.0.0.1:1235?streamid=#!::u=USERNAME_OF_PLAYER,r=${stream.streamResource},m=request,t=stream,s=Session_ID`;
+    stream.streamerUrl = `srt://34.18.74.212:1234?streamid=#!::r=${stream.streamResource},m=${stream.streamMode},t=stream&transtype=live&mode=${stream.streamSrtMode}&latency=10000`;
+    stream.playerUrl = `srt://34.18.74.212:1235?streamid=#!::u=USERNAME_OF_PLAYER,r=${stream.streamResource},m=request,t=stream,s=Session_ID`;
     stream.ffplay = `ffplay -fflags nobuffer -i '${stream.playerUrl}'`;
     const newStream = await models.Stream.create(stream);
 
