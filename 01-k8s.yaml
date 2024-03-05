@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+  namespace: backend-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: gcr.io/final-project-413218/backend:v1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: JWT_SECRET
+          value: "4b8e5678fa4c46d5b5f6a2295d50b224"
+        - name: DB_NAME
+          value: "la79y"
+        - name: DB_USER
+          value: "admin"
+        - name: DB_PASSWORD
+          value: "1234"
+        - name: DB_HOST
+          value: "localhost"
+        resources:
+          requests:
+            memory: "30Mi"
+            cpu: "5m"
+          limits:
+            memory: "30Mi"
+            cpu: "5m"
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: backend-namespace
+spec:
+  type: LoadBalancer
+  selector:
+    app: backend
+  ports:
+  - name: http
+    port: 443
+    targetPort: 8080
+    protocol: TCP
+
