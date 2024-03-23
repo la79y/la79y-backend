@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-volume
+  namespace: backend-namespace
+  labels:
+    type: local
+    app: postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data/postgresql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-volume-claim
+  namespace: backend-namespace
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: backend-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: 'postgres:14'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "la79y"
+            - name: POSTGRES_USER
+              value: "admin"
+            - name: POSTGRES_PASSWORD
+              value: "1234"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresdata
+      volumes:
+        - name: postgresdata
+          persistentVolumeClaim:
+            claimName: postgres-volume-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: backend-namespace
+  labels:
+    app: postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
