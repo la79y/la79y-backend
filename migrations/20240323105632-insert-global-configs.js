@@ -11,12 +11,12 @@ module.exports = {
      */
     await queryInterface.bulkInsert('GlobalConfigs', [{
       key: 'origin_passphrase',
-      value: 'origin_pass',
+      value: 'origin_pass1234',
       createdAt: new Date(),
       updatedAt: new Date()
     },{
       key: 'edge_passphrase',
-      value: 'edge_pass',
+      value: 'edge_pass1234',
       createdAt: new Date(),
       updatedAt: new Date()
     },{
