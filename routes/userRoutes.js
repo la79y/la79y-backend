@@ -2,16 +2,68 @@ const express = require("express");
 const router = express.Router();
 const { models } = require("../database");
 const jwt = require("jsonwebtoken");
+const sgMail = require("@sendgrid/mail");
+require("dotenv").config();
+
+sgMail.setApiKey(process.env.SENDGRID_KEY);
 
 router.post("/signup", async (req, res) => {
   try {
     const newUser = await models.User.create(req.body);
+    const token = jwt.sign(newUser.email, process.env.JWT_SECRET);
+
+    const to = req.body.email;
+    const subject = "Verify Email";
+    const from = "noreply@younes.ai";
+    const html = `
+        <p>Hi there,</p>
+        <p>Thank you for signing up. Please verify your email address by clicking on the link below:</p>
+        <p>Click <a href="http://localhost:3000/verify?email=${newUser.email}&token=${token}">here</a>
+        <p>Have a great day!</p>
+      `;
+    const msg = {
+      from,
+      to,
+      subject,
+      html,
+    };
+
+    await sgMail.send(msg);
     res.status(201).json({
-      message: "Account created successfully",
-      data: newUser
+      message: "Account created successfully. Please verify your email.",
+      data: newUser,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+});
+
+router.patch("/verify", async (req, res) => {
+  try {
+    const { email, token } = req.query;
+
+    if (!email || !token) {
+      return res.status(400).json({ error: "Email and token are required" });
+    }
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded || decoded !== email) {
+      return res.status(401).json({ error: "Invalid or expired token" });
+    }
+
+    // Token is valid, proceed with email verification
+    const user = await models.User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Update emailVerified field to true
+    await user.update({ emailVerified: true });
+
+    res.status(200).json({ message: "Email verified successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -21,7 +73,19 @@ router.post("/login", async (req, res) => {
       where: { username: req.body.username },
     });
 
-    if (user && (await user.verifyPassword(req.body.password))) {
+    if (!user) {
+      return res.status(401).json({ error: "Authentication failed" });
+    }
+
+    // Check if the user is verified
+    if (!user.emailVerified) {
+      return res
+        .status(401)
+        .json({ error: "Email not verified. Please verify your email." });
+    }
+
+    // Verify password
+    if (await user.verifyPassword(req.body.password)) {
       // Create the token payload
       const payload = {
         userId: user.id,
@@ -33,15 +97,15 @@ router.post("/login", async (req, res) => {
         expiresIn: "1h",
       });
 
-      res.json({
+      return res.json({
         message: "Authentication successful!",
         token: token,
       });
     } else {
-      res.status(401).json({ error: "Authentication failed" });
+      return res.status(401).json({ error: "Authentication failed" });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 

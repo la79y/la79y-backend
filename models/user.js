@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: {
           args: true,
-          msg: 'Username must be unique.',
+          msg: "Username must be unique.",
         },
         validate: {
           isAlphanumeric: {
@@ -29,8 +29,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: {
           args: true,
-          msg: 'Email must be unique.',
-        },        validate: {
+          msg: "Email must be unique.",
+        },
+        validate: {
           isEmail: {
             args: true,
             msg: "Email must be a valid email address",
@@ -46,6 +47,11 @@ module.exports = (sequelize, DataTypes) => {
             msg: "The password must be at least 6 characters long",
           },
         },
+      },
+      emailVerified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     },
     {

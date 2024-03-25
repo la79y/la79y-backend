@@ -1,3 +1,4 @@
+./start_postgres.sh
 npm install
 node server.js
 
@@ -5,9 +6,8 @@ npx sequelize-cli db:migrate
 npx sequelize-cli db:migrate --url "postgresql://admin:1234@localhost:5431/la79y"
 npx sequelize-cli db:migrate:undo
 
-
-
 ## Deploy to digital ocean
+
 ### deploy database
 
 ```shell

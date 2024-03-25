@@ -24,5 +24,7 @@ app.use((err, req, res, next) => {
 });
 
 sequelize.sync().then(() => {
-  app.listen(Number(process.env.SERVER_PORT), () => console.log(`Server running on port ${process.env.SERVER_PORT}`));
+  app.listen(Number(process.env.SERVER_PORT), () =>
+    console.log(`Server running on port ${process.env.SERVER_PORT}`)
+  );
 });
