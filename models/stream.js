@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: {
         args: true,
-        msg: 'Stream resource must be unique.',
+        msg: "Stream resource must be unique.",
       },
       validate: {
         isAlphanumeric: {
@@ -47,11 +47,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: false,
     },
-    streamSrtMode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: false,
-    },
     streamerUrl: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -62,11 +57,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: false,
     },
-    ffplay:{
+    ffplay: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: false,
-    }
+    },
   });
 
   Stream.findByStreamName = function (stream_resource) {
