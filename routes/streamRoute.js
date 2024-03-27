@@ -8,9 +8,17 @@ router.post("/stream", authenticateToken, async (req, res) => {
     // Create new stream
     const stream = req.body;
     stream.userid = req.user.userId + "";
+    const config = await models.GlobalConfig.findAll();
+    const origin_address = config.find((row)=> row.get('key')==='origin_address').get('value')
+    const origin_passphrase = config.find((row)=> row.get('key')==='origin_passphrase').get('value')
+    const origin_keyLength = config.find((row)=> row.get('key')==='origin_keyLength').get('value')
+    const edge_address = config.find((row)=> row.get('key')==='edge_address').get('value')
+    const edge_passphrase = config.find((row)=> row.get('key')==='edge_passphrase').get('value')
+    const edge_keyLength = config.find((row)=> row.get('key')==='edge_keyLength').get('value')
+    console.log(origin_address)
 
-    stream.streamerUrl = `srt://209.38.176.82:10080?streamid=#!::r=${stream.streamResource},m=${stream.streamMode},t=stream&transtype=live&mode=caller&latency=10000&passphrase=origin_pass1234&pbkeylen=16`;
-    stream.playerUrl = `srt://164.90.241.38:10081?streamid=#!::u=USERNAME_OF_PLAYER,r=${stream.streamResource},m=request,t=stream,s=Session_ID&passphrase=edge_pass1234`;
+    stream.streamerUrl = `srt://${origin_address}?streamid=#!::r=${stream.streamResource},m=${stream.streamMode},t=stream&transtype=live&mode=caller&latency=1000&passphrase=${origin_passphrase}&pbkeylen=${origin_keyLength}`;
+    stream.playerUrl = `srt://${edge_address}?streamid=#!::u=USERNAME_OF_PLAYER,r=${stream.streamResource},m=request,t=stream,s=Session_ID&passphrase=${edge_passphrase}`;
     stream.ffplay = `ffplay -fflags nobuffer -i '${stream.playerUrl}'`;
     const newStream = await models.Stream.create(stream);
 
