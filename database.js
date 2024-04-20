@@ -2,6 +2,7 @@ const Sequelize = require("sequelize");
 const UserModel = require("./models/user");
 const StreamModel = require("./models/stream");
 const GlobalConfigModel = require("./models/global_config");
+const SessionsModel = require('./models/sessions')
 
 // Using environment variables to store sensitive information
 const dbName = process.env.DB_NAME || "la79y";
@@ -18,6 +19,7 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
 const User = UserModel(sequelize, Sequelize.DataTypes);
 const Stream = StreamModel(sequelize, Sequelize.DataTypes);
 const GlobalConfig = GlobalConfigModel(sequelize, Sequelize.DataTypes);
+const Sessions = SessionsModel(sequelize, Sequelize.DataTypes);
 
 User.hasMany(Stream, { foreignKey: "userId" });
 Stream.belongsTo(User, { foreignKey: "userId" });
@@ -25,7 +27,8 @@ Stream.belongsTo(User, { foreignKey: "userId" });
 const models = {
   User,
   Stream,
-  GlobalConfig
+  GlobalConfig,
+  Sessions
 };
 
 module.exports = { sequelize, Sequelize, models };
