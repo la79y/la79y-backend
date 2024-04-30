@@ -42,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: false,
     },
+    streamRole: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: false,
+    },
     streamerLocation: {
       type: DataTypes.STRING,
       allowNull: false,

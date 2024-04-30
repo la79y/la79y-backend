@@ -9,13 +9,15 @@ router.post("/stream", authenticateToken, async (req, res) => {
     const stream = req.body;
     stream.userid = req.user.userId + "";
     const config = await models.GlobalConfig.findAll();
-    const origin_address = config.find((row)=> row.get('key')==='origin_address').get('value')
-    const origin_passphrase = config.find((row)=> row.get('key')==='origin_passphrase').get('value')
-    const origin_keyLength = config.find((row)=> row.get('key')==='origin_keyLength').get('value')
-    const edge_address = config.find((row)=> row.get('key')==='edge_address').get('value')
-    const edge_passphrase = config.find((row)=> row.get('key')==='edge_passphrase').get('value')
-    const edge_keyLength = config.find((row)=> row.get('key')==='edge_keyLength').get('value')
-    console.log(origin_address)
+    const origin_address = config
+      .find((row) => row.get("key") === "origin_address")
+      .get("value");
+    const origin_passphrase = config
+      .find((row) => row.get("key") === "origin_passphrase")
+      .get("value");
+    const origin_keyLength = config
+      .find((row) => row.get("key") === "origin_keyLength")
+      .get("value");
 
     stream.streamerUrl = `srt://<ORIGIN_ADDRESS>?streamid=#!::u=<USERNAME_OF_STREAMER>,r=${stream.streamResource},s=<SESSION_ID>,m=publish,t=stream&transtype=live&mode=caller&latency=1000&passphrase=<ORIGIN_PASSPHRASE>&pbkeylen=<ORIGIN_KEYLENGTH>`;
     stream.playerUrl = `srt://<EDGE_ADDRESS>?streamid=#!::u=<USERNAME_OF_PLAYER>,r=${stream.streamResource},s=<SESSION_ID>,m=request,t=stream&passphrase=<EDGE_PASSPHRASE>&pbkeylen=<EDGE_KEYLENGTH>`;
@@ -24,23 +26,16 @@ router.post("/stream", authenticateToken, async (req, res) => {
     const newSession = await models.Sessions.create({
       username: req.user.username,
       resource: `${stream.streamResource}`,
-      used: false
-    })
+      used: false,
+    });
     const stream_resp = {
+      name: newStream.streamResource,
       streamerUrl: newStream.streamerUrl
-          .replace('<USERNAME_OF_STREAMER>',  req.user.username)
-          .replace('<SESSION_ID>',  newSession.id)
-          .replace('<ORIGIN_ADDRESS>', origin_address)
-          .replace('<ORIGIN_PASSPHRASE>', origin_passphrase)
-          .replace('<ORIGIN_KEYLENGTH>', origin_keyLength),
-      playerUrl: newStream.playerUrl
-          .replace('<EDGE_ADDRESS>', edge_address)
-          .replace('<EDGE_PASSPHRASE>',edge_passphrase)
-          .replace('<EDGE_KEYLENGTH>',edge_keyLength),
-      ffplay: newStream.ffplay
-          .replace('<EDGE_ADDRESS>', edge_address)
-          .replace('<EDGE_PASSPHRASE>',edge_passphrase)
-          .replace('<EDGE_KEYLENGTH>',edge_keyLength)
+        .replace("<USERNAME_OF_STREAMER>", req.user.username)
+        .replace("<SESSION_ID>", newSession.id)
+        .replace("<ORIGIN_ADDRESS>", origin_address)
+        .replace("<ORIGIN_PASSPHRASE>", origin_passphrase)
+        .replace("<ORIGIN_KEYLENGTH>", origin_keyLength),
     };
     // Return the newly created stream object along with the SRT URL
     res.status(201).json({ data: stream_resp });
@@ -52,33 +47,41 @@ router.post("/stream", authenticateToken, async (req, res) => {
 router.get("/stream", authenticateToken, async (req, res) => {
   try {
     const config = await models.GlobalConfig.findAll();
-    const edge_address = config.find((row)=> row.get('key')==='edge_address').get('value')
-    const edge_passphrase = config.find((row)=> row.get('key')==='edge_passphrase').get('value')
-    const edge_keyLength = config.find((row)=> row.get('key')==='edge_keyLength').get('value')
+    const edge_address = config
+      .find((row) => row.get("key") === "edge_address")
+      .get("value");
+    const edge_passphrase = config
+      .find((row) => row.get("key") === "edge_passphrase")
+      .get("value");
+    const edge_keyLength = config
+      .find((row) => row.get("key") === "edge_keyLength")
+      .get("value");
 
     const streams = await models.Stream.findAll();
-    const streamsUpdated = await Promise.all(streams.map(async (stream) => {
-      const newSession = await models.Sessions.create({
-        username: req.user.username,
-        resource: `${stream.streamResource}`,
-        used: false
+    const streamsUpdated = await Promise.all(
+      streams.map(async (stream) => {
+        const newSession = await models.Sessions.create({
+          username: req.user.username,
+          resource: `${stream.streamResource}`,
+          used: false,
+        });
+        return {
+          name: stream.streamTitle,
+          playerUrl: stream.playerUrl
+            .replace("<USERNAME_OF_PLAYER>", req.user.username)
+            .replace("<SESSION_ID>", newSession.id)
+            .replace("<EDGE_ADDRESS>", edge_address)
+            .replace("<EDGE_PASSPHRASE>", edge_passphrase)
+            .replace("<EDGE_KEYLENGTH>", edge_keyLength),
+          ffplay: stream.ffplay
+            .replace("<USERNAME_OF_PLAYER>", req.user.username)
+            .replace("<SESSION_ID>", newSession.id)
+            .replace("<EDGE_ADDRESS>", edge_address)
+            .replace("<EDGE_PASSPHRASE>", edge_passphrase)
+            .replace("<EDGE_KEYLENGTH>", edge_keyLength),
+        };
       })
-      return ({
-      name: stream.streamTitle,
-      playerUrl: stream.playerUrl
-          .replace("<USERNAME_OF_PLAYER>", req.user.username)
-          .replace('<SESSION_ID>',  newSession.id)
-          .replace('<EDGE_ADDRESS>', edge_address)
-          .replace('<EDGE_PASSPHRASE>',edge_passphrase)
-          .replace('<EDGE_KEYLENGTH>',edge_keyLength),
-      ffplay: stream.ffplay
-          .replace("<USERNAME_OF_PLAYER>", req.user.username)
-          .replace('<SESSION_ID>',  newSession.id)
-          .replace('<EDGE_ADDRESS>', edge_address)
-          .replace('<EDGE_PASSPHRASE>',edge_passphrase)
-          .replace('<EDGE_KEYLENGTH>',edge_keyLength),
-    })
-    }));
+    );
 
     res.status(200).json({ data: streamsUpdated });
   } catch (error) {
@@ -89,59 +92,43 @@ router.get("/stream", authenticateToken, async (req, res) => {
 router.get("/streams-of-streamer", authenticateToken, async (req, res) => {
   try {
     const config = await models.GlobalConfig.findAll();
-    const origin_address = config.find((row)=> row.get('key')==='origin_address').get('value')
-    const origin_passphrase = config.find((row)=> row.get('key')==='origin_passphrase').get('value')
-    const origin_keyLength = config.find((row)=> row.get('key')==='origin_keyLength').get('value')
-    const edge_address = config.find((row)=> row.get('key')==='edge_address').get('value')
-    const edge_passphrase = config.find((row)=> row.get('key')==='edge_passphrase').get('value')
-    const edge_keyLength = config.find((row)=> row.get('key')==='edge_keyLength').get('value')
+    const origin_address = config
+      .find((row) => row.get("key") === "origin_address")
+      .get("value");
+    const origin_passphrase = config
+      .find((row) => row.get("key") === "origin_passphrase")
+      .get("value");
+    const origin_keyLength = config
+      .find((row) => row.get("key") === "origin_keyLength")
+      .get("value");
 
     const streams = await models.Stream.findAll({
       where: {
-        userId: req.user.userId
-      }
+        userId: req.user.userId,
+      },
     });
-    const streamsUpdated = await Promise.all(streams.map(async (stream) => {
-      const newSession = await models.Sessions.create({
-        username: req.user.username,
-        resource: `${stream.streamResource}`,
-        used: false
+    const streamsUpdated = await Promise.all(
+      streams.map(async (stream) => {
+        const newSession = await models.Sessions.create({
+          username: req.user.username,
+          resource: `${stream.streamResource}`,
+          used: false,
+        });
+        return {
+          name: stream.streamTitle,
+          streamerUrl: stream.streamerUrl
+            .replace("<USERNAME_OF_STREAMER>", req.user.username)
+            .replace("<SESSION_ID>", newSession.id)
+            .replace("<ORIGIN_ADDRESS>", origin_address)
+            .replace("<ORIGIN_PASSPHRASE>", origin_passphrase)
+            .replace("<ORIGIN_KEYLENGTH>", origin_keyLength),
+        };
       })
-      return {
-        name: stream.streamTitle,
-        streamerUrl: stream.streamerUrl
-            .replace('<USERNAME_OF_STREAMER>',  req.user.username)
-            .replace('<SESSION_ID>',  newSession.id)
-            .replace('<ORIGIN_ADDRESS>', origin_address)
-            .replace('<ORIGIN_PASSPHRASE>', origin_passphrase)
-            .replace('<ORIGIN_KEYLENGTH>', origin_keyLength)
-        ,
-        playerUrl: stream.playerUrl
-            .replace("<USERNAME_OF_PLAYER>", req.user.username)
-            .replace('<EDGE_ADDRESS>', edge_address)
-            .replace('<EDGE_PASSPHRASE>',edge_passphrase)
-            .replace('<EDGE_KEYLENGTH>',edge_keyLength),
-        ffplay: stream.ffplay
-            .replace("<USERNAME_OF_PLAYER>", req.user.username)
-            .replace('<EDGE_ADDRESS>', edge_address)
-            .replace('<EDGE_PASSPHRASE>',edge_passphrase)
-            .replace('<EDGE_KEYLENGTH>',edge_keyLength),
-      }
-    }));
+    );
     res.status(200).json({ data: streamsUpdated });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
-
-/* usage example:
-{
-    "streamResource": "Stream1",
-    "streamTitle": "Stream 1",
-    "userId": "1",
-    "streamMode": "publish",
-    "streamerLocation": "SA",
-}
-*/
 
 module.exports = router;
