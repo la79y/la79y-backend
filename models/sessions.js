@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             unique: false
         },
+        is_streamer: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+        },
         used: {
             type: DataTypes.BOOLEAN,
             allowNull: false,

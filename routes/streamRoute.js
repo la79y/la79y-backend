@@ -26,6 +26,7 @@ router.post("/stream", authenticateToken, async (req, res) => {
       username: req.user.username,
       resource: `${newStream.id}`,
       used: false,
+      is_streamer: true,
     });
     const stream_resp = {
       name: newStream.streamTitle,
@@ -115,6 +116,7 @@ router.get("/streams-of-streamer", authenticateToken, async (req, res) => {
           username: req.user.username,
           resource: `${stream.id}`,
           used: false,
+          is_streamer: true,
         });
         return {
           name: stream.streamTitle,
