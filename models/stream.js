@@ -1,22 +1,11 @@
 module.exports = (sequelize, DataTypes) => {
   const Stream = sequelize.define("Stream", {
-    streamResource: {
-      type: DataTypes.STRING,
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      unique: {
-        args: true,
-        msg: "Stream resource must be unique.",
-      },
-      validate: {
-        isAlphanumeric: {
-          args: true,
-          msg: "The stream resource can only contain letters and numbers",
-        },
-        len: {
-          args: [3, 25],
-          msg: "The stream resource must be between 3 and 25 characters long",
-        },
-      },
+      primaryKey: true,
+      comment: 'will be used as streamResource , stream id'
     },
     streamTitle: {
       type: DataTypes.STRING,
@@ -38,11 +27,6 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     streamMode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: false,
-    },
-    streamRole: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: false,
