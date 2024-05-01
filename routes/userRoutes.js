@@ -49,7 +49,7 @@ router.post("/signup", async (req, res) => {
       from: from,
       to: to,
       subject: subject,
-      text: html
+      html: html
     };
     // Send email
     transporter.sendMail(mailOptions, (error, info) => {
@@ -183,7 +183,7 @@ router.post("/reset-password-request", async (req, res) => {
       from: msg.from,
       to: msg.to,
       subject: msg.subject,
-      text: msg.html
+      html: msg.html
     };
     // Send email
     transporter.sendMail(mailOptions, (error, info) => {
