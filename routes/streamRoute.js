@@ -7,7 +7,7 @@ router.post("/stream", authenticateToken, async (req, res) => {
   try {
     // Create new stream
     const stream = req.body;
-    stream.userid = req.user.userId + "";
+    stream.userId = req.user.userId + "";
     const config = await models.GlobalConfig.findAll();
     const origin_address = config
       .find((row) => row.get("key") === "origin_address")

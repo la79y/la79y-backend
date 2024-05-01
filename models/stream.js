@@ -26,11 +26,6 @@ module.exports = (sequelize, DataTypes) => {
         key: "id",
       },
     },
-    streamMode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: false,
-    },
     streamerLocation: {
       type: DataTypes.STRING,
       allowNull: false,
