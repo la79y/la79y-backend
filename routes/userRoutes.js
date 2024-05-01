@@ -163,7 +163,7 @@ router.post("/reset-password-request", async (req, res) => {
       html: `
         <p>Hi there,</p>
         <p>You have requested to reset your password. Click the link below to reset your password:</p>
-        <p>Click <a href="http://localhost:3000/reset-password?email=${user.email}&token=${token}">here</a>
+        <p>Click <a href="${process.env.WEB_PROTO}://${process.env.WEB_HOST}:${process.env.WEB_PORT}/reset-password?email=${user.email}&token=${token}">here</a>
         <p>If you did not request a password reset, please ignore this email.</p>
       `,
     };
