@@ -18,7 +18,7 @@ router.post("/signup", async (req, res) => {
 
     const to = req.body.email;
     const subject = "Verify Email";
-    // const from = "noreply@younes.ai";
+    const from = 'Bander From La79y App <bandr1994@gmail.com>';
     const html = `
         <p>Hi there,</p>
         <p>Thank you for signing up. Please verify your email address by clicking on the link below:</p>
@@ -46,7 +46,7 @@ router.post("/signup", async (req, res) => {
     });
     // Email options
     const mailOptions = {
-      from: 'Bander From La79y App <bandr1994@gmail.com>',
+      from: from,
       to: to,
       subject: subject,
       text: html
@@ -158,7 +158,7 @@ router.post("/reset-password-request", async (req, res) => {
 
     const msg = {
       to: email,
-      from: "noreply@younes.ai",
+      from: 'Bander From La79y App <bandr1994@gmail.com>',
       subject: "Reset Password",
       html: `
         <p>Hi there,</p>
@@ -167,10 +167,38 @@ router.post("/reset-password-request", async (req, res) => {
         <p>If you did not request a password reset, please ignore this email.</p>
       `,
     };
+    // await sgMail.send(msg);
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: 'bandr1994@gmail.com', // Your Gmail address
+        clientId: process.env.GCP_CLIENT_ID,
+        clientSecret: process.env.GCP_CLIENT_SECRET,
+        refreshToken: process.env.GCP_REFRESH_TOKEN
+      }
+    });
+    // Email options
+    const mailOptions = {
+      from: msg.from,
+      to: msg.to,
+      subject: msg.subject,
+      text: msg.html
+    };
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return     res.status(200).json({ message: "Reset password link sent successfully" });
+      } else {
+        console.log('Email sent:', info.response);
+        return res.status(201).json({
+          message: "Account created successfully. Please verify your email.",
+          data: newUser,
+        });
+      }
+    });
 
-    await sgMail.send(msg);
-
-    res.status(200).json({ message: "Reset password link sent successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
