@@ -6,6 +6,9 @@ npx sequelize-cli db:migrate
 npx sequelize-cli db:migrate --url "postgresql://admin:1234@localhost:5431/la79y"
 npx sequelize-cli db:migrate:undo
 
+
+Use the OAuth 2.0 Playground (https://developers.google.com/oauthplayground) to obtain a refresh token.
+
 ## Deploy to digital ocean
 
 ### deploy database

@@ -3,6 +3,7 @@ const router = express.Router();
 const { models } = require("../database");
 const jwt = require("jsonwebtoken");
 const sgMail = require("@sendgrid/mail");
+const nodemailer = require('nodemailer');
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
@@ -17,25 +18,57 @@ router.post("/signup", async (req, res) => {
 
     const to = req.body.email;
     const subject = "Verify Email";
-    const from = "noreply@younes.ai";
+    // const from = "noreply@younes.ai";
     const html = `
         <p>Hi there,</p>
         <p>Thank you for signing up. Please verify your email address by clicking on the link below:</p>
-        <p>Click <a href="http://localhost:3000/verify?email=${newUser.email}&token=${token}">here</a>
+        <p>Click <a href="${process.env.WEB_PROTO}://${process.env.WEB_HOST}:${process.env.WEB_PORT}/verify?email=${newUser.email}&token=${token}">here</a>
         <p>Have a great day!</p>
       `;
-    const msg = {
-      from,
-      to,
-      subject,
-      html,
-    };
+    // const msg = {
+    //   from,
+    //   to,
+    //   subject,
+    //   html,
+    // };
+    //
+    // await sgMail.send(msg);
 
-    await sgMail.send(msg);
-    res.status(201).json({
-      message: "Account created successfully. Please verify your email.",
-      data: newUser,
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: 'bandr1994@gmail.com', // Your Gmail address
+        clientId: process.env.GCP_CLIENT_ID,
+        clientSecret: process.env.GCP_CLIENT_SECRET,
+        refreshToken: process.env.GCP_REFRESH_TOKEN
+      }
     });
+    // Email options
+    const mailOptions = {
+      from: 'Bander From La79y App <bandr1994@gmail.com>',
+      to: to,
+      subject: subject,
+      text: html
+    };
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        return res.status(500).send('Error sending email');
+      } else {
+        console.log('Email sent:', info.response);
+        return res.status(201).json({
+          message: "Account created successfully. Please verify your email.",
+          data: newUser,
+        });
+      }
+    });
+
+    // res.status(201).json({
+    //   message: "Account created successfully. Please verify your email.",
+    //   data: newUser,
+    // });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
