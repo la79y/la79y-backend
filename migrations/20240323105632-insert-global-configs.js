@@ -39,7 +39,17 @@ module.exports = {
       value: '164.90.241.38:10081',
       createdAt: new Date(),
       updatedAt: new Date()
-    }], {});
+    },{
+        key: 'enable_test_session_id',
+        value: 'true',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },{
+        key: 'test_session_id',
+        value: '12345678-1234-1234-1234-123456789abc',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }], {});
   },
 
   async down (queryInterface, Sequelize) {
