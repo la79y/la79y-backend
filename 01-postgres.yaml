@@ -49,6 +49,13 @@ spec:
         - name: postgres
           image: 'postgres:14'
           imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "2048Mi"
+              cpu: "1000m"
           ports:
             - containerPort: 5432
           env:
