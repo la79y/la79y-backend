@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: bandersaeed94/la79y:backend-v1
+        image: bandersaeed94/la79y:backend-v6
         ports:
         - containerPort: 8080
         env:
