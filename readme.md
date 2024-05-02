@@ -17,6 +17,7 @@ Use the OAuth 2.0 Playground (https://developers.google.com/oauthplayground) to 
 kubectl apply -f 00-namespace.yaml
 kubectl apply -f 01-postgres.yaml
 kubectl apply -f 01-k8s-prod.yaml
+kubectl get service -n backend-namespace
 kubectl port-forward service/postgres 5431:5432 -n backend-namespace
 ```
 
@@ -24,3 +25,8 @@ kubectl port-forward service/postgres 5431:5432 -n backend-namespace
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
 kubectl proxy
 http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+
+## Local build
+DOCKER_BUILDKIT=1 docker build . -t la79y-backend-local2
+docker run --network app-tier -e DB_NAME="la79y" -e DB_USER="admin" -e DB_PASSWORD="1234" -e DB_HOST=la79y-postgres -e JWT_SECRET=4b8e5678fa4c46d5b5f6a2295d50b224   -e SERVER_PORT=8080 la79y-backend-local2

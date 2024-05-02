@@ -3,7 +3,7 @@
     "username": "admin",
     "password": "1234",
     "database": "la79y",
-    "host": "localhost",
+    "host": "postgres.backend-namespace",
     "dialect": "postgres"
   },
   "test": {
