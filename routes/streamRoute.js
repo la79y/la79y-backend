@@ -82,6 +82,7 @@ router.get("/stream", authenticateToken, async (req, res) => {
             .replace("<EDGE_ADDRESS>", edge_address)
             .replace("<EDGE_PASSPHRASE>", edge_passphrase)
             .replace("<EDGE_KEYLENGTH>", edge_keyLength),
+          isStreaming: stream.isStreaming
         };
       })
     );
