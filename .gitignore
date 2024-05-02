@@ -1,3 +1,4 @@
 .env
 node_modules
 .idea
+01-k8s-prod.yaml
