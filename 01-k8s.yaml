@@ -17,12 +17,15 @@ spec:
     spec:
       containers:
       - name: backend
-        image: bandersaeed94/la79y:backend-v11
+        image: bandersaeed94/la79y:backend-v14
         ports:
         - containerPort: 8080
+        - containerPort: 8443
         env:
         - name: SERVER_PORT
           value: '8080'
+        - name: HTTPS_SERVER_PORT
+          value: '8443'
         - name: JWT_SECRET
           value: "4b8e5678fa4c46d5b5f6a2295d50b224"
         - name: DB_NAME
@@ -66,7 +69,7 @@ spec:
   ports:
   - name: http-443
     port: 443
-    targetPort: 8080
+    targetPort: 8443
     protocol: TCP
   - name: http-80
     port: 80
