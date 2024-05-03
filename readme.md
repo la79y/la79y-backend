@@ -35,3 +35,8 @@ docker run --network app-tier -e DB_NAME="la79y" -e DB_USER="admin" -e DB_PASSWO
 Certificate is saved at: /etc/letsencrypt/live/la79y.com/fullchain.pem
 Key is saved at:         /etc/letsencrypt/live/la79y.com/privkey.pem
 This certificate expires on 2024-07-31.
+
+# Metric api
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/high-availability-1.21+.yaml
+kubectl top pod
+kubectl top node
